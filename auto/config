@@ -6,19 +6,19 @@ set -o pipefail # Bashism
 # You can put a local mirror here if you want (or you can set
 # it in .mirror)
 if [ -e .mirror ]; then
-    kali_mirror=$(cat .mirror)
+    threat_mirror=$(cat .mirror)
 else
-    kali_mirror=http://kali.download/kali
+    threat_mirror=http://threat.download/threat
 fi
 
 ### DO NOT EDIT THE REST OF THIS FILE ###
 
-public_kali_mirror=http://http.kali.org/kali
+public_threat_mirror=http://http.threatcode.github.io/threat
 
 # Detect target architecture and filter args
 temp=""
 arch=$(dpkg --print-architecture)
-dist="kali-rolling"
+dist="threat-rolling"
 lb_opts=""
 while [ $# -gt 0 ]; do
    	arg="$1"
@@ -55,14 +55,14 @@ done
 eval set -- "$temp"
 
 # Resolve release name
-dist=$(wget -q -O- $kali_mirror/dists/$dist/Release | awk '/^Codename:/ {print $2}')
+dist=$(wget -q -O- $threat_mirror/dists/$dist/Release | awk '/^Codename:/ {print $2}')
 if [ -z "$dist" ]; then
 	echo "ERROR: Build release could not be resolved"
 	exit 1
 fi
 
 # live-build doesn't work if --parent-debian-distribution is unknown of
-# debian-cd => we have to put a symlink so that it deals with kali like sid
+# debian-cd => we have to put a symlink so that it deals with threat like sid
 if [ ! -e ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd/$dist ]; then
 	if [ -w ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd ]; then
 		ln -sf sid ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd/$dist
@@ -94,33 +94,33 @@ esac
 
 # Define options that vary across distributions
 case "$dist" in
-    kali-last-snapshot)
-	# We don't want kali-last-snapshot to end up in the image, it
-	# should be replaced with kali-rolling
-	lb_opts="$lb_opts --distribution-binary kali-rolling"
-	lb_opts="$lb_opts --debootstrap-script /usr/share/debootstrap/scripts/kali-rolling"
+    threat-last-snapshot)
+	# We don't want threat-last-snapshot to end up in the image, it
+	# should be replaced with threat-rolling
+	lb_opts="$lb_opts --distribution-binary threat-rolling"
+	lb_opts="$lb_opts --debootstrap-script /usr/share/debootstrap/scripts/threat-rolling"
     ;;
 esac
 
 # Setup configuration files from variant and options
 
 # Drop all files that a former run might have put into place
-for file in $(cd kali-config && find ./common ./variant-* -type f); do
+for file in $(cd threat-config && find ./common ./variant-* -type f); do
     file=${file#./*/}
     rm -fv config/$file
 done
-rm -fv config/archives/kali-proposed-updates.list.*
+rm -fv config/archives/threat-proposed-updates.list.*
 
-# Copy over all files from official kali configuration
-cp -rT kali-config/common config
-[ ! -d kali-config/variant-$variant ] || cp -rTL kali-config/variant-$variant config
+# Copy over all files from official threat configuration
+cp -rT threat-config/common config
+[ ! -d threat-config/variant-$variant ] || cp -rTL threat-config/variant-$variant config
 
 if [ -n "$enable_pu" ]; then
 	mkdir -p config/archives
-	echo "deb $kali_mirror $dist-proposed-updates main contrib non-free non-free-firmware" \
-		> config/archives/kali-proposed-updates.list.chroot
-	echo "deb $public_kali_mirror $dist-proposed-updates main contrib non-free non-free-firmware" \
-		> config/archives/kali-proposed-updates.list.binary
+	echo "deb $threat_mirror $dist-proposed-updates main contrib non-free non-free-firmware" \
+		> config/archives/threat-proposed-updates.list.chroot
+	echo "deb $public_threat_mirror $dist-proposed-updates main contrib non-free non-free-firmware" \
+		> config/archives/threat-proposed-updates.list.binary
 fi
 
 lb config noauto \
@@ -128,19 +128,19 @@ lb config noauto \
 	--distribution "$dist" \
 	--debian-installer-distribution "$dist" \
 	--archive-areas "main contrib non-free non-free-firmware" \
-	--debootstrap-options "--keyring=/usr/share/keyrings/kali-archive-keyring.gpg" \
-	--keyring-packages kali-archive-keyring \
+	--debootstrap-options "--keyring=/usr/share/keyrings/threat-archive-keyring.gpg" \
+	--keyring-packages threat-archive-keyring \
 	--updates false \
 	--backports false \
 	--source false \
 	--firmware-binary true \
 	--firmware-chroot true \
-	--mirror-bootstrap "$kali_mirror" \
-	--mirror-debian-installer "$kali_mirror" \
-	--mirror-binary "$public_kali_mirror" \
-	--iso-application "Kali Linux" \
-	--iso-publisher "Kali" \
-	--iso-volume "Kali Live" \
+	--mirror-bootstrap "$threat_mirror" \
+	--mirror-debian-installer "$threat_mirror" \
+	--mirror-binary "$public_threat_mirror" \
+	--iso-application "Threat Linux" \
+	--iso-publisher "Threat" \
+	--iso-volume "Threat Live" \
 	--linux-packages linux-image \
 	--memtest memtest86+ \
 	--bootappend-live "boot=live components quiet splash noeject" \

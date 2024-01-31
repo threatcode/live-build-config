@@ -1,0 +1,17 @@
+# Installer image with threat-linux-everything
+
+# Metapackages
+# You can customize the set of Threat metapackages (groups of tools) available
+# in the installer ISO.
+# For the complete list see: https://tools.threatcode.github.io/threat-metapackages
+threat-linux-firmware
+threat-linux-core
+threat-tools-top10
+threat-linux-default
+threat-linux-large
+threat-linux-everything
+
+# Graphical desktops
+threat-desktop-xfce
+threat-desktop-gnome
+threat-desktop-kde

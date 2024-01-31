@@ -1,0 +1,21 @@
+# Installer for Threat Purple
+
+# Metapackages
+# You can customize the set of Threat metapackages (groups of tools) available
+# in the installer ISO.
+# For the complete list see: https://tools.threatcode.github.io/threat-metapackages
+threat-linux-firmware
+threat-system-gui
+threat-themes-purple  # temporary, until we do it a better way
+
+# Tools
+threat-tools-detect
+threat-tools-identify
+threat-tools-protect
+threat-tools-recover
+threat-tools-respond
+
+# Graphical desktops
+threat-desktop-xfce
+threat-desktop-gnome
+threat-desktop-kde

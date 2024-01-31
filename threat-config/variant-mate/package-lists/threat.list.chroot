@@ -1,0 +1,24 @@
+# Live image
+# You always want these:
+threat-linux-core
+threat-desktop-live
+
+# Metapackages
+# You can customize the set of Threat metapackages (groups of tools) to install
+# For the complete list see: https://tools.threatcode.github.io/threat-metapackages
+#threat-linux-core
+#threat-tools-top10
+threat-linux-default
+#threat-linux-large
+#threat-linux-everything
+
+# Graphical desktop
+threat-desktop-mate
+# | NOTE: With Threat 1.x, the mate desktop requires other changes to the live config.
+# | See ~ https://web.archive.org/web/20150721230745/http://docs.threatcode.github.io/live-build/customize-the-threat-desktop-environment
+#if DISTRIBUTION moto
+mate-archive-keyring
+#endif
+
+# Threat applications
+#<package>

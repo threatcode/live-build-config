@@ -25,7 +25,7 @@ live-image-*.hybrid.iso.zsync
 live-image-*.packages
 # Overwritten due to build.sh
 simple-cdd/debian-cd/*
-simple-cdd/profiles/kali.downloads
+simple-cdd/profiles/threat.downloads
 # Miscellaneous
 .lock
 .stage

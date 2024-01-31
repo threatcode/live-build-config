@@ -5,10 +5,10 @@ set -e
 # Use return code for any command errors in part of a pipe
 set -o pipefail # Bashism
 
-# Kali's default values
-KALI_DIST="kali-rolling"
-KALI_VERSION=""
-KALI_VARIANT="default"
+# Threat's default values
+THREAT_DIST="threat-rolling"
+THREAT_VERSION=""
+THREAT_VARIANT="default"
 IMAGE_TYPE="live"
 TARGET_DIR="$(dirname $0)/images"
 TARGET_SUBDIR=""
@@ -29,21 +29,21 @@ image_name() {
 }
 
 live_image_name() {
-	case "$KALI_ARCH" in
+	case "$THREAT_ARCH" in
 		i386|amd64|arm64)
-			echo "live-image-$KALI_ARCH.hybrid.iso"
+			echo "live-image-$THREAT_ARCH.hybrid.iso"
 		;;
 		armel|armhf)
-			echo "live-image-$KALI_ARCH.img"
+			echo "live-image-$THREAT_ARCH.img"
 		;;
 	esac
 }
 
 installer_image_name() {
-	if [ "$KALI_VARIANT" = "netinst" ]; then
-		echo "simple-cdd/images/kali-$KALI_VERSION-$KALI_ARCH-NETINST-1.iso"
+	if [ "$THREAT_VARIANT" = "netinst" ]; then
+		echo "simple-cdd/images/threat-$THREAT_VERSION-$THREAT_ARCH-NETINST-1.iso"
 	else
-		echo "simple-cdd/images/kali-$KALI_VERSION-$KALI_ARCH-BD-1.iso"
+		echo "simple-cdd/images/threat-$THREAT_VERSION-$THREAT_ARCH-BD-1.iso"
 	fi
 }
 
@@ -56,16 +56,16 @@ target_image_name() {
 		IMAGE_EXT="img"
 	fi
 	if [ "$IMAGE_TYPE" = "live" ]; then
-		if [ "$KALI_VARIANT" = "default" ]; then
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}kali-linux-$KALI_VERSION-live-$KALI_ARCH.$IMAGE_EXT"
+		if [ "$THREAT_VARIANT" = "default" ]; then
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}threat-linux-$THREAT_VERSION-live-$THREAT_ARCH.$IMAGE_EXT"
 		else
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}kali-linux-$KALI_VERSION-live-$KALI_VARIANT-$KALI_ARCH.$IMAGE_EXT"
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}threat-linux-$THREAT_VERSION-live-$THREAT_VARIANT-$THREAT_ARCH.$IMAGE_EXT"
 		fi
 	else
-		if [ "$KALI_VARIANT" = "default" ]; then
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}kali-linux-$KALI_VERSION-installer-$KALI_ARCH.$IMAGE_EXT"
+		if [ "$THREAT_VARIANT" = "default" ]; then
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}threat-linux-$THREAT_VERSION-installer-$THREAT_ARCH.$IMAGE_EXT"
 		else
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}kali-linux-$KALI_VERSION-installer-$KALI_VARIANT-$KALI_ARCH.$IMAGE_EXT"
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}threat-linux-$THREAT_VERSION-installer-$THREAT_VARIANT-$THREAT_ARCH.$IMAGE_EXT"
 		fi
 	fi
 }
@@ -77,8 +77,8 @@ target_build_log() {
 
 default_version() {
 	case "$1" in
-		kali-*)
-			echo "${1#kali-}"
+		threat-*)
+			echo "${1#threat-}"
 		;;
 		*)
 			echo "$1"
@@ -87,7 +87,7 @@ default_version() {
 }
 
 failure() {
-	echo "Build of $KALI_DIST/$KALI_VARIANT/$KALI_ARCH $IMAGE_TYPE image failed (see build.log for details)" >&2
+	echo "Build of $THREAT_DIST/$THREAT_VARIANT/$THREAT_ARCH $IMAGE_TYPE image failed (see build.log for details)" >&2
 	echo "Log: $BUILD_LOG" >&2
 	exit 2
 }
@@ -132,7 +132,7 @@ print_help() {
 		echo "  --${x}"
 	done
 	echo
-	echo "More information: https://www.kali.org/docs/development/live-build-a-custom-kali-iso/"
+	echo "More information: https://www.threatcode.github.io/docs/development/live-build-a-custom-threat-iso/"
 	exit 0
 }
 
@@ -149,17 +149,17 @@ temp=$(getopt -o "$BUILD_OPTS_SHORT" -l "$BUILD_OPTS_LONG,get-image-path" -- "$@
 eval set -- "$temp"
 while true; do
 	case "$1" in
-		-d|--distribution) KALI_DIST="$2"; shift 2; ;;
+		-d|--distribution) THREAT_DIST="$2"; shift 2; ;;
 		-p|--proposed-updates) OPT_pu="1"; shift 1; ;;
-		-a|--arch) KALI_ARCH="$2"; shift 2; ;;
+		-a|--arch) THREAT_ARCH="$2"; shift 2; ;;
 		-v|--verbose) VERBOSE="1"; shift 1; ;;
 		-D|--debug) DEBUG="1"; shift 1; ;;
 		-s|--salt) shift; ;;
 		-h|--help) print_help; ;;
 		--installer) IMAGE_TYPE="installer"; shift 1 ;;
 		--live) IMAGE_TYPE="live"; shift 1 ;;
-		--variant) KALI_VARIANT="$2"; shift 2; ;;
-		--version) KALI_VERSION="$2"; shift 2; ;;
+		--variant) THREAT_VARIANT="$2"; shift 2; ;;
+		--version) THREAT_VERSION="$2"; shift 2; ;;
 		--subdir) TARGET_SUBDIR="$2"; shift 2; ;;
 		--get-image-path) ACTION="get-image-path"; shift 1; ;;
 		--clean) ACTION="clean"; shift 1; ;;
@@ -170,42 +170,42 @@ while true; do
 done
 
 # Set default values
-KALI_ARCH=${KALI_ARCH:-$HOST_ARCH}
-if [ "$KALI_ARCH" = "x64" ]; then
-	KALI_ARCH="amd64"
-elif [ "$KALI_ARCH" = "x86" ]; then
-	KALI_ARCH="i386"
+THREAT_ARCH=${THREAT_ARCH:-$HOST_ARCH}
+if [ "$THREAT_ARCH" = "x64" ]; then
+	THREAT_ARCH="amd64"
+elif [ "$THREAT_ARCH" = "x86" ]; then
+	THREAT_ARCH="i386"
 fi
-debug "KALI_ARCH: $KALI_ARCH"
+debug "THREAT_ARCH: $THREAT_ARCH"
 
-if [ -z "$KALI_VERSION" ]; then
-	KALI_VERSION="$(default_version $KALI_DIST)"
+if [ -z "$THREAT_VERSION" ]; then
+	THREAT_VERSION="$(default_version $THREAT_DIST)"
 fi
-debug "KALI_VERSION: $KALI_VERSION"
+debug "THREAT_VERSION: $THREAT_VERSION"
 
 # Check parameters
 debug "HOST_ARCH: $HOST_ARCH"
-if [ "$HOST_ARCH" != "$KALI_ARCH" ] && [ "$IMAGE_TYPE" != "installer" ]; then
-	case "$HOST_ARCH/$KALI_ARCH" in
+if [ "$HOST_ARCH" != "$THREAT_ARCH" ] && [ "$IMAGE_TYPE" != "installer" ]; then
+	case "$HOST_ARCH/$THREAT_ARCH" in
 		amd64/i386|i386/amd64)
 		;;
 		*)
-			echo "Can't build $KALI_ARCH image on $HOST_ARCH system." >&2
+			echo "Can't build $THREAT_ARCH image on $HOST_ARCH system." >&2
 			exit 1
 		;;
 	esac
 fi
 
 # Build parameters for lb config
-KALI_CONFIG_OPTS="--distribution $KALI_DIST -- --variant $KALI_VARIANT"
-CODENAME=$KALI_DIST # for simple-cdd/debian-cd
+THREAT_CONFIG_OPTS="--distribution $THREAT_DIST -- --variant $THREAT_VARIANT"
+CODENAME=$THREAT_DIST # for simple-cdd/debian-cd
 if [ -n "$OPT_pu" ]; then
-	KALI_CONFIG_OPTS="$KALI_CONFIG_OPTS --proposed-updates"
-	KALI_DIST="$KALI_DIST+pu"
+	THREAT_CONFIG_OPTS="$THREAT_CONFIG_OPTS --proposed-updates"
+	THREAT_DIST="$THREAT_DIST+pu"
 fi
-debug "KALI_CONFIG_OPTS: $KALI_CONFIG_OPTS"
+debug "THREAT_CONFIG_OPTS: $THREAT_CONFIG_OPTS"
 debug "CODENAME: $CODENAME"
-debug "KALI_DIST: $KALI_DIST"
+debug "THREAT_DIST: $THREAT_DIST"
 
 # Set sane PATH (cron seems to lack /sbin/ dirs)
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -222,13 +222,13 @@ fi
 debug "IMAGE_TYPE: $IMAGE_TYPE"
 case "$IMAGE_TYPE" in
 	live)
-		if [ ! -d "$(dirname $0)/kali-config/variant-$KALI_VARIANT" ]; then
-			echo "ERROR: Unknown variant of Kali live configuration: $KALI_VARIANT" >&2
+		if [ ! -d "$(dirname $0)/threat-config/variant-$THREAT_VARIANT" ]; then
+			echo "ERROR: Unknown variant of Threat live configuration: $THREAT_VARIANT" >&2
 		fi
 
 		ver_live_build=$(dpkg-query -f '${Version}' -W live-build)
-		if dpkg --compare-versions "$ver_live_build" lt "1:20230502+kali3"; then
-			echo "ERROR: You need live-build (>= 1:20230502+kali3), you have $ver_live_build" >&2
+		if dpkg --compare-versions "$ver_live_build" lt "1:20230502+threat3"; then
+			echo "ERROR: You need live-build (>= 1:20230502+threat3), you have $ver_live_build" >&2
 			exit 1
 		fi
 		debug "ver_live_build: $ver_live_build"
@@ -241,13 +241,13 @@ case "$IMAGE_TYPE" in
 		debug "ver_debootstrap: $ver_debootstrap"
 	;;
 	installer)
-		if [ ! -d "$(dirname $0)/kali-config/installer-$KALI_VARIANT" ]; then
-			echo "ERROR: Unknown variant of Kali installer configuration: $KALI_VARIANT" >&2
+		if [ ! -d "$(dirname $0)/threat-config/installer-$THREAT_VARIANT" ]; then
+			echo "ERROR: Unknown variant of Threat installer configuration: $THREAT_VARIANT" >&2
 		fi
 
 		ver_debian_cd=$(dpkg-query -f '${Version}' -W debian-cd)
-		if dpkg --compare-versions "$ver_debian_cd" lt 3.2.1+kali1; then
-			echo "ERROR: You need debian-cd (>= 3.2.1+kali1), you have $ver_debian_cd" >&2
+		if dpkg --compare-versions "$ver_debian_cd" lt 3.2.1+threat1; then
+			echo "ERROR: You need debian-cd (>= 3.2.1+threat1), you have $ver_debian_cd" >&2
 			exit 1
 		fi
 		debug "ver_debian_cd: $ver_debian_cd"
@@ -276,12 +276,12 @@ else
 fi
 debug "SUDO: $SUDO"
 
-IMAGE_NAME="$(image_name $KALI_ARCH)"
+IMAGE_NAME="$(image_name $THREAT_ARCH)"
 debug "IMAGE_NAME: $IMAGE_NAME"
 
 debug "ACTION: $ACTION"
 if [ "$ACTION" = "get-image-path" ]; then
-	echo $(target_image_name $KALI_ARCH)
+	echo $(target_image_name $THREAT_ARCH)
 	exit 0
 fi
 
@@ -301,7 +301,7 @@ set +e
 case "$IMAGE_TYPE" in
 	live)
 		debug "Stage 1/2 - Config"
-		run_and_log lb config -a $KALI_ARCH $KALI_CONFIG_OPTS "$@"
+		run_and_log lb config -a $THREAT_ARCH $THREAT_CONFIG_OPTS "$@"
 		[ $? -eq 0 ] || failure
 
 		debug "Stage 2/2 - Build"
@@ -313,27 +313,27 @@ case "$IMAGE_TYPE" in
 	installer)
 		# Override some debian-cd environment variables
 		export BASEDIR="$(pwd)/simple-cdd/debian-cd"
-		export ARCHES=$KALI_ARCH
-		export ARCH=$KALI_ARCH
-		export DEBVERSION=$KALI_VERSION
+		export ARCHES=$THREAT_ARCH
+		export ARCH=$THREAT_ARCH
+		export DEBVERSION=$THREAT_VERSION
 		debug "BASEDIR: $BASEDIR"
 		debug "ARCHES: $ARCHES"
 		debug "ARCH: $ARCH"
 		debug "DEBVERSION: $DEBVERSION"
 
-		if [ "$KALI_VARIANT" = "netinst" ]; then
+		if [ "$THREAT_VARIANT" = "netinst" ]; then
 			export DISKTYPE="NETINST"
-			profiles="kali"
-			auto_profiles="kali"
-		elif [ "$KALI_VARIANT" = "purple" ]; then
+			profiles="threat"
+			auto_profiles="threat"
+		elif [ "$THREAT_VARIANT" = "purple" ]; then
 			export DISKTYPE="BD"
-			profiles="kali kali-purple offline"
-			auto_profiles="kali kali-purple offline"
+			profiles="threat threat-purple offline"
+			auto_profiles="threat threat-purple offline"
 			export KERNEL_PARAMS="debian-installer/theme=Clearlooks-Purple"
 		else    # plain installer
 			export DISKTYPE="BD"
-			profiles="kali offline"
-			auto_profiles="kali offline"
+			profiles="threat offline"
+			auto_profiles="threat offline"
 		fi
 		debug "DISKTYPE: $DISKTYPE"
 		debug "profiles: $profiles"
@@ -341,14 +341,14 @@ case "$IMAGE_TYPE" in
 		[ -v KERNEL_PARAMS ] && debug "KERNEL_PARAMS: $KERNEL_PARAMS"
 
 		if [ -e .mirror ]; then
-			kali_mirror=$(cat .mirror)
+			threat_mirror=$(cat .mirror)
 		else
-			kali_mirror=http://archive.kali.org/kali/
+			threat_mirror=http://archive.threatcode.github.io/threat/
 		fi
-		if ! echo "$kali_mirror" | grep -q '/$'; then
-			kali_mirror="$kali_mirror/"
+		if ! echo "$threat_mirror" | grep -q '/$'; then
+			threat_mirror="$threat_mirror/"
 		fi
-		debug "kali_mirror: $kali_mirror"
+		debug "threat_mirror: $threat_mirror"
 
 		debug "Stage 1/2 - File(s)"
 		# Setup custom debian-cd to make our changes
@@ -357,7 +357,7 @@ case "$IMAGE_TYPE" in
 
 		# Use the same grub theme as in the live images
 		# Until debian-cd is smart enough: http://bugs.debian.org/1003927
-		cp -f kali-config/common/bootloaders/grub-pc/grub-theme.in simple-cdd/debian-cd/data/$CODENAME/grub-theme.in
+		cp -f threat-config/common/bootloaders/grub-pc/grub-theme.in simple-cdd/debian-cd/data/$CODENAME/grub-theme.in
 
 		# Keep 686-pae udebs as we changed the default from 686
 		# to 686-pae in the debian-installer images
@@ -365,20 +365,20 @@ case "$IMAGE_TYPE" in
 			simple-cdd/debian-cd/data/$CODENAME/exclude-udebs-i386
 		[ $? -eq 0 ] || failure
 
-		# Configure the kali profile with the packages we want
-		grep -v '^#' kali-config/installer-$KALI_VARIANT/packages \
-			> simple-cdd/profiles/kali.downloads
+		# Configure the threat profile with the packages we want
+		grep -v '^#' threat-config/installer-$THREAT_VARIANT/packages \
+			> simple-cdd/profiles/threat.downloads
 		[ $? -eq 0 ] || failure
 
 		# Tasksel is required in the mirror for debian-cd
-		echo tasksel >> simple-cdd/profiles/kali.downloads
+		echo tasksel >> simple-cdd/profiles/threat.downloads
 		[ $? -eq 0 ] || failure
 
 		# Grub is the only supported bootloader on arm64
 		# so ensure it's on the iso for arm64.
-		if [ "$KALI_ARCH" = "arm64" ]; then
+		if [ "$THREAT_ARCH" = "arm64" ]; then
 			debug "arm64 GRUB"
-			echo "grub-efi-arm64" >> simple-cdd/profiles/kali.downloads
+			echo "grub-efi-arm64" >> simple-cdd/profiles/threat.downloads
 			[ $? -eq 0 ] || failure
 		fi
 
@@ -391,7 +391,7 @@ case "$IMAGE_TYPE" in
 			--force-root \
 			--conf simple-cdd.conf \
 			--dist $CODENAME \
-			--debian-mirror $kali_mirror \
+			--debian-mirror $threat_mirror \
 			--profiles "$profiles" \
 			--auto-profiles "$auto_profiles"
 		res=$?
@@ -406,8 +406,8 @@ esac
 set -e
 
 debug "Moving files"
-run_and_log mv -f $IMAGE_NAME $TARGET_DIR/$(target_image_name $KALI_ARCH)
-run_and_log mv -f "$BUILD_LOG" $TARGET_DIR/$(target_build_log $KALI_ARCH)
+run_and_log mv -f $IMAGE_NAME $TARGET_DIR/$(target_image_name $THREAT_ARCH)
+run_and_log mv -f "$BUILD_LOG" $TARGET_DIR/$(target_build_log $THREAT_ARCH)
 
-run_and_log echo -e "\n***\nGENERATED KALI IMAGE: $TARGET_DIR/$(target_image_name $KALI_ARCH)\n***"
+run_and_log echo -e "\n***\nGENERATED THREAT IMAGE: $TARGET_DIR/$(target_image_name $THREAT_ARCH)\n***"
 

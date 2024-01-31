@@ -1,0 +1,23 @@
+# Full installer image
+# It should contain everything offered in tasksel
+# during initial installation so all threat-linux-* except:
+# - threat-linux-everything
+
+# Metapackages
+# You can customize the set of Threat metapackages (groups of tools) available
+# in the installer ISO.
+# For the complete list see: https://tools.threatcode.github.io/threat-metapackages
+threat-linux-firmware
+threat-linux-core
+threat-tools-top10
+threat-linux-default
+
+# NOTE: We would like to provide threat-linux-large in our installer images
+# but we end up with ISO images that are too big for our CDN. So disable
+# it for now.
+# threat-linux-large
+
+# Graphical desktops
+threat-desktop-xfce
+threat-desktop-gnome
+threat-desktop-kde

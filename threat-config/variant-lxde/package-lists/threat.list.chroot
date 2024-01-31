@@ -1,0 +1,19 @@
+# Live image
+# You always want these:
+threat-linux-core
+threat-desktop-live
+
+# Metapackages
+# You can customize the set of Threat metapackages (groups of tools) to install
+# For the complete list see: https://tools.threatcode.github.io/threat-metapackages
+#threat-linux-core
+#threat-tools-top10
+threat-linux-default
+#threat-linux-large
+#threat-linux-everything
+
+# Graphical desktop
+threat-desktop-lxde
+
+# Threat applications
+#<package>
